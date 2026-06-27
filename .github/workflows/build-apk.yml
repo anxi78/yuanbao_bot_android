@@ -1,0 +1,38 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'main.py'
+      - 'buildozer.spec'
+      - 'requirements.txt'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'main.py'
+      - 'buildozer.spec'
+      - 'requirements.txt'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: kivy/buildozer:latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build APK with Buildozer
+        run: |
+          buildozer android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: yuanbaobot-debug-apk
+          path: bin/*.apk
