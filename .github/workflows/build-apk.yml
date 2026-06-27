@@ -36,7 +36,9 @@ jobs:
           python3 -c "import urllib.request; urllib.request.urlretrieve('$NDK_URL', '$NDK_ZIP')"
           echo "Extracting NDK..."
           unzip -q "$NDK_ZIP" -d ~/.buildozer/android/platform/
-          echo "NDK ready at ~/.buildozer/android/platform/android-ndk-r26d"
+          echo "Renaming directory to match buildozer expected name..."
+          mv ~/.buildozer/android/platform/android-ndk-r26d ~/.buildozer/android/platform/android-ndk-r26.3.11579264
+          echo "NDK ready"
 
       - name: Build APK with Buildozer
         run: |
