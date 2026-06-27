@@ -19,6 +19,7 @@ android.ndk = 26.3.11579264
 android.permissions = INTERNET
 android.archs = arm64-v8a
 android.add_src =
+p4a.local_recipes = .p4a/recipes
 
 # iOS specific
 ios.codesign.allowed = false
