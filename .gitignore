@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+
+# Android build artifacts
+bin/
+.buildozer/
+*.apk
+*.aab
+
+# Config (user-specific)
+config.json
+
+# OS
+.DS_Store
+Thumbs.db
