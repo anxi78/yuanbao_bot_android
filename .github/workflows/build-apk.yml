@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: kivy/buildozer:2025.06.01
+      image: kivy/buildozer:latest
 
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +41,8 @@ jobs:
           echo "NDK ready"
 
       - name: Build APK with Buildozer
+        env:
+          AIOHTTP_NO_EXTENSIONS: 1
         run: |
           yes | buildozer android debug
 
