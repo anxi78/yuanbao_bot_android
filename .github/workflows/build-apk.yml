@@ -27,6 +27,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Pre-download Android NDK r26d
+        run: |
+          mkdir -p ~/.buildozer/android/platform
+          NDK_URL="https://dl.google.com/android/repository/android-ndk-r26d-linux.zip"
+          NDK_ZIP="/tmp/android-ndk-r26d-linux.zip"
+          echo "Downloading NDK r26d..."
+          curl -sL -o "$NDK_ZIP" "$NDK_URL"
+          echo "Extracting NDK..."
+          unzip -q "$NDK_ZIP" -d ~/.buildozer/android/platform/
+          echo "NDK ready at ~/.buildozer/android/platform/android-ndk-r26d"
+
       - name: Build APK with Buildozer
         run: |
           yes | buildozer android debug
