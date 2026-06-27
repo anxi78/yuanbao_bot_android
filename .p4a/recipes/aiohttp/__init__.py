@@ -1,8 +1,8 @@
 """Build AIOHTTP - override to use 3.9+ and skip C extensions for Python 3.14 compatibility"""
-from pythonforandroid.recipe import CppCompiledComponentsPythonRecipe
+from pythonforandroid.recipe import PythonRecipe
 
 
-class AIOHTTPRecipe(CppCompiledComponentsPythonRecipe):  # type: ignore # pylint: disable=R0903
+class AIOHTTPRecipe(PythonRecipe):  # type: ignore # pylint: disable=R0903
     version = "3.9.5"
     url = "https://pypi.python.org/packages/source/a/aiohttp/aiohttp-{version}.tar.gz"
     name = "aiohttp"
