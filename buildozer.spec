@@ -5,7 +5,7 @@ package.domain = com.yuanbao.bot
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,ttf
 version = 0.1
-requirements = python3,kivy>=2.2.0,aiohttp>=3.9.0
+requirements = python3,kivy,aiohttp
 orientation = portrait
 osx.python_version = 3
 osx.kivy_version = 2.2.0
@@ -17,7 +17,7 @@ android.minapi = 21
 android.sdk = 33
 android.ndk = 26.3.11579264
 android.permissions = INTERNET
-android.arch = arm64-v8a
+android.archs = arm64-v8a
 android.add_src =
 
 # iOS specific
