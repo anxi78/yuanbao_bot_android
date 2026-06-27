@@ -414,7 +414,13 @@ class SimpleProtobufCodec:
 
     @staticmethod
     def encode_conn_msg(head, data=b''):
-        return encode_conn_msg(0, "", 0, "", "")  # 占位，下面重写
+        decoded = SimpleProtobufCodec.decode_head(head)
+        cmd_type = decoded.get("cmd_type", 0)
+        cmd = decoded.get("cmd", "")
+        seq_no = decoded.get("seq_no", 0)
+        msg_id = decoded.get("msg_id", "")
+        module = decoded.get("module", "")
+        return encode_conn_msg(cmd_type, cmd, seq_no, msg_id, module, data)
 
     @staticmethod
     def encode_auth_bind_req(biz_id, uid, source, token):

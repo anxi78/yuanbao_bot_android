@@ -552,21 +552,35 @@ class BotClient:
             sticker["name"], sticker["width"],
             sticker["height"], sticker["formats"],
         )
-        msg_content = pb_string(1, "TIMFaceElem") + pb_msg(2, face_elem)
-        body = encode_send_group_req(self.group_code, "") + msg_content
-        # 注意：这里需要构建实际消息体
+        body_elem = pb_string(1, "TIMFaceElem") + pb_msg(2, face_elem)
+        body = (
+            pb_string(1, _generate_msg_id())                           # msg_id
+            + pb_string(2, self.group_code)                            # group_code
+            + pb_string(3, self.bot_id or "")                         # from_account
+            + pb_string(4, "")                                         # to_account
+            + pb_string(5, str(random.randint(1, 999999999)))         # random
+            + pb_msg(6, body_elem)                                     # msgBody
+            + pb_string(7, "")                                         # refMsgId
+        )
         self._log(f"发送贴纸: {sticker_name}")
-        return True
+        result = await self._send_biz_request(BIZ_CMD_SEND_GROUP, body)
+        return (result or {}).get("status", -1) == 0
 
     async def send_image(self, url: str) -> bool:
-        """发送图片消息"""
+        """发送图片消息（通过 URL）"""
         img_elem = encode_tim_image_elem(url)
-        body = encode_send_group_req(self.group_code, "")
+        body = (
+            pb_string(1, _generate_msg_id())                           # msg_id
+            + pb_string(2, self.group_code)                            # group_code
+            + pb_string(3, self.bot_id or "")                         # from_account
+            + pb_string(4, "")                                         # to_account
+            + pb_string(5, str(random.randint(1, 999999999)))         # random
+            + pb_msg(6, img_elem)                                      # msgBody (TIMImageElem)
+            + pb_string(7, "")                                         # refMsgId
+        )
+        self._log(f"发送图片: {url}")
         result = await self._send_biz_request(BIZ_CMD_SEND_GROUP, body)
-        if result:
-            code = result.get("status", -1)
-            return code == 0
-        return False
+        return (result or {}).get("status", -1) == 0
 
     async def send_at_message(self, text: str, at_users: List[str]) -> bool:
         """发送艾特消息"""
