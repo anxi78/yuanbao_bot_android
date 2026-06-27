@@ -13,6 +13,9 @@ bin/
 # Config (user-specific)
 config.json
 
+# Build logs
+ci-build.log
+
 # OS
 .DS_Store
 Thumbs.db
