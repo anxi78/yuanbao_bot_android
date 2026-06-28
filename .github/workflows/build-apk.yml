@@ -67,11 +67,24 @@ jobs:
           # Phase 2.5: Patch p4a build.gradle template for Gradle 8.14 implicit dependency validation
           P4A_TEMPLATES=$(find .buildozer/venv -path "*/bootstraps/common/build/templates" -type d 2>/dev/null | head -1)
           if [ -n "$P4A_TEMPLATES" ] && [ -f "$P4A_TEMPLATES/build.tmpl.gradle" ] && [ -f .github/build-gradle-fix.groovy ]; then
-            echo "Patching build.gradle template for Gradle 8.14 implicit dependency validation..."
+            echo "Patching build.gradle template in buildozer venv..."
             cat .github/build-gradle-fix.groovy >> "$P4A_TEMPLATES/build.tmpl.gradle"
             echo "Applied Gradle 8.14 implicit dependency fix"
           else
-            echo "WARNING: Could not find p4a build.gradle template or fix file"
+            # Fallback: try patching system Python p4a
+            SYS_P4A=$(python3 -c "import pythonforandroid; print(pythonforandroid.__path__[0])" 2>/dev/null || echo "")
+            if [ -n "$SYS_P4A" ] && [ -f .github/build-gradle-fix.groovy ]; then
+              SYS_TEMPLATE="$SYS_P4A/bootstraps/common/build/templates/build.tmpl.gradle"
+              if [ -f "$SYS_TEMPLATE" ]; then
+                echo "Patching build.gradle template in system Python p4a: $SYS_TEMPLATE"
+                cat .github/build-gradle-fix.groovy >> "$SYS_TEMPLATE"
+                echo "Applied Gradle 8.14 implicit dependency fix"
+              else
+                echo "WARNING: Could not find build.tmpl.gradle at $SYS_TEMPLATE"
+              fi
+            else
+              echo "WARNING: Could not find p4a build.gradle template or fix file"
+            fi
           fi
 
           # Phase 3: Run the actual build
