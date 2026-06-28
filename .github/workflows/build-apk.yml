@@ -64,6 +64,16 @@ jobs:
             fi
           fi
 
+          # Phase 2.5: Patch p4a build.gradle template for Gradle 8.14 implicit dependency validation
+          P4A_TEMPLATES=$(find .buildozer/venv -path "*/bootstraps/common/build/templates" -type d 2>/dev/null | head -1)
+          if [ -n "$P4A_TEMPLATES" ] && [ -f "$P4A_TEMPLATES/build.tmpl.gradle" ] && [ -f .github/build-gradle-fix.groovy ]; then
+            echo "Patching build.gradle template for Gradle 8.14 implicit dependency validation..."
+            cat .github/build-gradle-fix.groovy >> "$P4A_TEMPLATES/build.tmpl.gradle"
+            echo "Applied Gradle 8.14 implicit dependency fix"
+          else
+            echo "WARNING: Could not find p4a build.gradle template or fix file"
+          fi
+
           # Phase 3: Run the actual build
           echo "Starting build..."
           yes | buildozer android debug
