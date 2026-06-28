@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: kivy/buildozer:2025.06.01
+      image: kivy/buildozer:latest
 
     steps:
       - uses: actions/checkout@v4
@@ -40,10 +40,32 @@ jobs:
           mv ~/.buildozer/android/platform/android-ndk-r26d ~/.buildozer/android/platform/android-ndk-r26.3.11579264
           echo "NDK ready"
 
-      - name: Build APK with Buildozer
+      - name: Build APK with Buildozer (patched aiohttp)
         env:
           AIOHTTP_NO_EXTENSIONS: 1
         run: |
+          # Phase 1: Let buildozer set up p4a venv (creates .buildozer/venv)
+          echo "Setting up buildozer and p4a..."
+          timeout 120 buildozer android p4a -- --help 2>&1 | tail -3 || true
+
+          # Phase 2: Patch aiohttp recipe in buildozer's venv
+          P4A_RECIPES=$(find .buildozer/venv -path "*/pythonforandroid/recipes" -type d 2>/dev/null | head -1)
+          if [ -n "$P4A_RECIPES" ] && [ -f .p4a/recipes/aiohttp/__init__.py ]; then
+            echo "Patching aiohttp recipe in buildozer venv: $P4A_RECIPES/aiohttp/"
+            cp -v .p4a/recipes/aiohttp/__init__.py "$P4A_RECIPES/aiohttp/__init__.py"
+            grep 'version' "$P4A_RECIPES/aiohttp/__init__.py" | head -1
+          else
+            # Fallback: try patching system Python p4a
+            SYS_P4A=$(python3 -c "import pythonforandroid; print(pythonforandroid.__path__[0])" 2>/dev/null || echo "")
+            if [ -n "$SYS_P4A" ] && [ -f .p4a/recipes/aiohttp/__init__.py ]; then
+              echo "Patching aiohttp recipe in system Python: $SYS_P4A/recipes/aiohttp/"
+              cp -v .p4a/recipes/aiohttp/__init__.py "$SYS_P4A/recipes/aiohttp/__init__.py"
+              grep 'version' "$SYS_P4A/recipes/aiohttp/__init__.py" | head -1
+            fi
+          fi
+
+          # Phase 3: Run the actual build
+          echo "Starting build..."
           yes | buildozer android debug
 
       - name: Upload APK
